@@ -175,21 +175,6 @@ export async function geocodeAsync(address) {
         throw error;
     });
 }
-// export async function reverseGeocodeAsync(location) {
-//     if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
-//         throw new TypeError('Location should be an object with number properties `latitude` and `longitude`.');
-//     }
-//     return ExpoLocation.reverseGeocodeAsync(location).then(r => console.log(r, 'o.O')).catch(error => {
-//         const platformUsesGoogleMaps = Platform.OS === 'android' || Platform.OS === 'web';
-//         if (platformUsesGoogleMaps && error.code === 'E_NO_GEOCODER') {
-//             if (!googleApiKey) {
-//                 throw new CodedError(error.code, `${error.message} Please set a Google API Key to use geocoding.`);
-//             }
-//             return _googleReverseGeocodeAsync(location);
-//         }
-//         throw error;
-//     });
-// }
 
 export async function reverseGeocodeAsync(location) {
     if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
