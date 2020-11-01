@@ -186,7 +186,7 @@ export async function reverseGeocodeAsync(location) {
         .then(json => {
 
             return [{
-                city: json.city,
+                city: json.city || json.locality,
                 country: json.countryName,
                 isoCountryCode: json.countryCode,
                 region: json.principalSubdivision,
