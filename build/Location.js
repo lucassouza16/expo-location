@@ -5,6 +5,9 @@ import { LocationAccuracy, LocationActivityType, LocationGeofencingEventType, Lo
 import { LocationEventEmitter } from './LocationEventEmitter';
 import { setGoogleApiKey, googleGeocodeAsync, googleReverseGeocodeAsync, } from './LocationGoogleGeocoding';
 import { LocationSubscriber, HeadingSubscriber, _getCurrentWatchId } from './LocationSubscribers';
+
+const bigdataApiUrl = 'https://api.bigdatacloud.net/data/reverse-geocode-client';
+
 export async function getProviderStatusAsync() {
     return ExpoLocation.getProviderStatusAsync();
 }
@@ -93,14 +96,32 @@ export async function geocodeAsync(address, options) {
 /**
  * The opposite behavior of `geocodeAsync` — translates location coordinates to an array of addresses.
  */
-export async function reverseGeocodeAsync(location, options) {
+export const reverseGeocodeAsync = async (location) => {
     if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
-        throw new TypeError('Location to reverse-geocode must be an object with number properties `latitude` and `longitude`.');
+        throw new TypeError('Location should be an object with number properties `latitude` and `longitude`.');
     }
-    if (options?.useGoogleMaps || Platform.OS === 'web') {
-        return await googleReverseGeocodeAsync(location);
-    }
-    return await ExpoLocation.reverseGeocodeAsync(location);
+
+    return fetch(`${bigdataApiUrl}?latitude=${location.latitude}&longitude=${location.longitude}`)
+        .then(res => res.json())
+        .then(json => {
+
+            return [{
+                city: json.city || json.locality,
+                country: json.countryName,
+                isoCountryCode: json.countryCode,
+                region: json.principalSubdivision,
+                // name, postalCode, street
+            }]
+        })
+        .catch(error => {
+            const platformUsesGoogleMaps = Platform.OS === 'android' || Platform.OS === 'web';
+            if (platformUsesGoogleMaps) {
+                if (!googleApiKey) {
+                    throw new CodedError(error.code, `${error.message} Please set a Google API Key to use geocoding.`);
+                }
+                return _googleReverseGeocodeAsync(location);
+            }
+        })
 }
 /**
  * Gets the current state of location permissions.
