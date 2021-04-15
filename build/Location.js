@@ -116,7 +116,7 @@ export const reverseGeocodeAsync = async (location) => {
         .catch(() => {
             const platformUsesGoogleMaps = Platform.OS === 'android' || Platform.OS === 'web';
             if (platformUsesGoogleMaps) {
-                return await googleReverseGeocodeAsync(location);
+                return googleReverseGeocodeAsync(location);
             }
         })
 }
