@@ -113,13 +113,10 @@ export const reverseGeocodeAsync = async (location) => {
                 // name, postalCode, street
             }]
         })
-        .catch(error => {
+        .catch(() => {
             const platformUsesGoogleMaps = Platform.OS === 'android' || Platform.OS === 'web';
             if (platformUsesGoogleMaps) {
-                if (!googleApiKey) {
-                    throw new CodedError(error.code, `${error.message} Please set a Google API Key to use geocoding.`);
-                }
-                return _googleReverseGeocodeAsync(location);
+                return await googleReverseGeocodeAsync(location);
             }
         })
 }
